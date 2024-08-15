@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<% 
+  function formatDate(dateStr) {
+    const dateParts = dateStr.split("-");
+    const day = parseInt(dateParts[2]);
+    const month = parseInt(dateParts[1]) - 1; // months are 0-indexed in JS Date
+    const year = dateParts[0];
+
+    // Get day with ordinal suffix
+    const suffix = (day) => {
+      if (day > 3 && day < 21) return 'th'; // special case
+      switch (day % 10) {
+        case 1: return "st";
+        case 2: return "nd";
+        case 3: return "rd";
+        default: return "th";
+      }
+    };
+
+    const dayWithSuffix = day + suffix(day);
+
+    // Get month name
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthName = monthNames[month];
+
+    return `${dayWithSuffix} ${monthName} ${year}`;
+  }
+%>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal Entry : <%= formatDate(date) %>
+    </title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- Place the first <script> tag in your HTML's <head> -->
+    <script src="https://cdn.tiny.cloud/1/z96a54t3jmchai2jlfbyjn56o5iib7bhbnf7oy9chufst90g/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+
+
+    <!-- Place the following <script> and <textarea> tags your HTML's <body> -->
+    <script>
+        const useDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss markdown',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | codesample link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            mergetags_list: [
+                { value: 'First.Name', title: 'First Name' },
+                { value: 'Email', title: 'Email' },
+            ],
+            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+            skin: useDarkMode ? 'oxide-dark' : 'oxide',
+            content_css: useDarkMode ? 'dark' : 'default',
+            height: 600,
+            image_caption: true,
+            quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+            noneditable_class: 'mceNonEditable',
+            toolbar_mode: 'sliding',
+            contextmenu: 'link image table',
+            importcss_append: true,
+            autosave_ask_before_unload: false,
+            autosave_interval: '1s',
+        });
+    </script>
+
+</head>
+
+<body>
+    <h1>Journal Entry : <%= formatDate(date) %>
+    </h1>
+    <form action="/journal/<%= date %>" method="POST" style="display: inline;">
+        <textarea name="entry"><%= entry %></textarea><br>
+        <button type="submit" style="display: inline;">Save</button>
+    </form>
+    <button onclick="location.href='/'" style="display: inline;">Back to Calendar</button>
+</body>
+
+</html>
